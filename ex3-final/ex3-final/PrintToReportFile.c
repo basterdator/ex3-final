@@ -26,7 +26,7 @@ static BOOL release_res;
 int PrintToReportFile(int num_of_roomate, char *path)  /* A function Which writes to the Peoprt file
 													   using this key:
 													   num of rooommates == -1 : Print "Robot Active"
-													   num of rooommates == -2 : Print "Simulation started
+													   num of rooommates == -2 : Print "Simulation started"
 													   num of rooommates == %d  : Print "Roomate %d Active""*/
 
 {
@@ -46,7 +46,7 @@ int PrintToReportFile(int num_of_roomate, char *path)  /* A function Which write
 	if (num_of_roomate == -1)
 	{
 		// Write lines
-		retval = fputs("bl33p bl00p, r0b0t 4ct1v3\n", p_stream);
+		retval = fputs("Robot Active\n", p_stream);
 		if (0 > retval)
 		{
 			printf("Failed to write to file.\n");

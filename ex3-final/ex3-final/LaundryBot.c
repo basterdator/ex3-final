@@ -41,10 +41,11 @@ DWORD WINAPI LaundryBot(LPVOID lpParam)
 	char *p_debug_file_path = params_for_robot.debug_file_path;
 	while(TRUE)
 	{
+		printf("ROBOT STUCK AT SEMAPHORE LAUNDRY FULL\n");
 		// Down(laundry_full)
 		wait_res = WaitForSingleObject(laundry_full, INFINITE);
-		if (wait_res == FALSE) ReportErrorAndEndProgram();
-
+		//if (wait_res == FALSE) ReportErrorAndEndProgram();
+		printf("ROBOT RELEASED AT SEMAPHORE LAUNDRY FULL\n");
 
 		// If time is up and the number of active threads is 1 - then the last roomate turns the robot off - so the robot shuts itself down.
 		TimeIsUp = *params_for_robot.time_is_up;
@@ -52,6 +53,7 @@ DWORD WINAPI LaundryBot(LPVOID lpParam)
 		{
 			return LAUNDRYBOT_THREAD__CODE_SUCCESS;
 		}
+		PrintToReportFile(-1, p_report_file_path);
 
 		// Else: the robot needs to complete it's operation
 		// Writing in the log
@@ -65,15 +67,16 @@ DWORD WINAPI LaundryBot(LPVOID lpParam)
 		// Check each roomate whether he has zero clothes in his closet and he had a non zero num of clothes in the first place
 		for (i = 0; i < NUM_OF_ROOMMATES; i++)
 		{
-			if (p_roomate_list[i].curret_clothes == 0 && p_roomate_list[i].total_clothes != 0)
+			printf("i is %d\n",i);
+			if ((p_roomate_list+i)->curret_clothes == 0 && (p_roomate_list+i)->total_clothes != 0)
 			{
-				printf("%d", p_roomate_list[i].curret_clothes);
+				printf("Robot Releasing roomate %d from noclothes semaphore\n", ((p_roomate_list + i)->curret_clothes));
 				// empty the basket
 				num_of_clothes_in_basket = 0;
-				p_roomate_list[i].curret_clothes = p_roomate_list[i].total_clothes;  // fill up the closet
+				(p_roomate_list + i)->curret_clothes = (p_roomate_list + i)->total_clothes;  // fill up the closet
 				
 				release_res = ReleaseSemaphore(
-					p_roomate_list[i].NoClothes,
+					(p_roomate_list + i)->NoClothes,
 					1, 		/* Signal that exactly one cell was filled */
 					NULL);
 				if (release_res == FALSE) { ReportErrorAndEndProgram(); }
@@ -81,9 +84,9 @@ DWORD WINAPI LaundryBot(LPVOID lpParam)
 			}
 			else
 			{
-				if (p_roomate_list[i].total_clothes != 0)
+				if ((p_roomate_list + i)->total_clothes != 0)
 				{
-					p_roomate_list[i].curret_clothes = p_roomate_list[i].total_clothes;
+					(p_roomate_list + i)->curret_clothes = (p_roomate_list + i)->total_clothes;
 				}
 			}
 		}

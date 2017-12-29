@@ -15,7 +15,6 @@
 #define FILE_NUM 3
 #define MAX_PARAM_DIGITS 20 
 
-
 char *p_report_file_path;
 char *p_debug_file_path;
 int num_of_active_roomates;
@@ -205,6 +204,7 @@ int main(int argc,char *argv[]) {
 		//calling roomate i thread//
 		p_thread_handles[i+2] = CreateThreadSimple_roomate(Roommate, (p_thread_ids + i+2), (params_for_roomate + i));
 	}
+	
 
 	//----------------------------wait for all threads----------------------------//
 
@@ -221,9 +221,21 @@ int main(int argc,char *argv[]) {
 		return -1;
 	}
 
-	printf("time is up: %d\n", params_for_timer.time_is_up);
+	BOOL ret_val_handles = TRUE;
+	for (i = 0; i < num_of_paramters; i++)
+	{
+		printf("closing handle %d\n", i);
+		ret_val_handles = CloseHandle(p_thread_handles[i]);
+		if (FALSE == ret_val_handles)
+		{
+			printf("Error when closing: %d\n", GetLastError());
+			return FAILURE;
+		}
+	
+	}
 
-	printf("end of main\n");
+	free(params_for_roomate);
+	printf("SUCCESS!!!!!!!!!!!1\n");
 	return SUCCESS;
 }
 
@@ -346,7 +358,6 @@ void AllocateParams(int n_roomates, roomate_params **roomates_params) {
 
 	
 	*roomates_params = (roomate_params *)calloc(n_roomates, sizeof(roomate_params));
-
 
 }
 

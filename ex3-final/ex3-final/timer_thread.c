@@ -28,7 +28,7 @@ DWORD WINAPI Timer(LPVOID lpParam)
 	//Sleep(1000);
 	printf("after timer\n");
 	
-	(*params_for_timer).time_is_up = 1;
+	(*params_for_timer).time_is_up = TRUE;
 
 	return TIMER_THREAD__CODE_SUCCESS;
 
