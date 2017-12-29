@@ -81,8 +81,21 @@ int main(int argc,char *argv[]) {
 		return FAILURE;
 	}
 
+
+
 	//--------------------------print "simulation started"------------------------//
-	PrintToFile("simulation started\n", p_report_file_path);
+	write_to_file = CreateMutex(
+		NULL,   /* default security attributes */
+		FALSE,	/* don't lock mutex immediately */
+		NULL); /* un-named */
+	if (write_to_file == NULL)
+	{
+		CloseHandle(write_to_file);
+		return -1;
+	}
+
+	PrintToReportFile(-2, p_report_file_path);
+	PrintToDebugFile("Simulation Started\n", p_debug_file_path);
 
 	//-------------------------parse parameters file------------------------------//
 
@@ -104,15 +117,7 @@ int main(int argc,char *argv[]) {
 	M = *laundry_basket_size;
 	printf("T_d is: %d,basket size is: %d\n", *total_run_time, *laundry_basket_size);
 	//-------------------creating semaophores and handles--------------//
-	write_to_file = CreateMutex(
-		NULL,   /* default security attributes */
-		FALSE,	/* don't lock mutex immediately */
-		NULL); /* un-named */
-	if (write_to_file == NULL)
-	{
-		CloseHandle(write_to_file);
-		return -1;
-	}
+	
 
 	laundry_room = CreateMutex(
 		NULL,   /* default security attributes */
@@ -149,14 +154,14 @@ int main(int argc,char *argv[]) {
 
 	for (i = 0; i < num_of_roomates; i++)
 	{
-		(*roomates_array).NoClothes = CreateSemaphore(
+		(roomates_array + i)->NoClothes = CreateSemaphore(
 			NULL,	/* Default security attributes */
 			0,		/* Initial Count - all slots are empty */
 			1,		/* Maximum Count */
 			NULL); /* un-named */
-		if ((*roomates_array).NoClothes == NULL)
+		if ((roomates_array + i)->NoClothes == NULL)
 		{
-			CloseHandle((*roomates_array).NoClothes);
+			CloseHandle((roomates_array + i)->NoClothes);
 			return -1;
 		}
 
@@ -263,7 +268,7 @@ int ImportroomatesArray(char *filename, int num_of_params, roomate **roomates_ar
 	}
 	int i;
 	FILE *input_file;
-	fopen_s(&input_file, filename, "r");//open the input file that contains a raw list of roomates and candys
+	fopen_s(&input_file, filename, "r");//open the input file that contains a raw list of roomates and times
 										//	char *line_for_parse = malloc(sizeof(char)*MAX_LINE_SIZE);
 	line *lines_from_file = malloc(MAX_LINE_SIZE*num_of_params * sizeof(char));
 	char *p_roomate_time;
@@ -352,7 +357,7 @@ void AssignParams(int n_roomates, roomate_params *roomates_params, int *time_is_
 		(roomates_params + i)->roomate_index = i;
 		(roomates_params + i)->report_file_path = p_report_file_path;
 		(roomates_params + i)->debug_file_path = p_debug_file_path;
-		(roomates_params + i)->roomates_array = (roomates_array + i);
+		(roomates_params + i)->roomates_array = roomates_array;
 		(roomates_params + i)->time_is_up = time_is_up;
 	}
 }

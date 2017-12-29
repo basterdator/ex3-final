@@ -57,44 +57,32 @@ DWORD WINAPI Roommate(LPVOID lpParam)
 	BOOL TimeIsUp;
 	while(TRUE)
 	{
-		printf("go to sleep - , %d \n", roommate_num);
+		printf("went to sleep - %d\n", roommate_num);
 		Sleep((*p_current_roommate).time);
-		printf("woke up - , %d \n", roommate_num);
+		printf("woke up - %d\n", roommate_num);
 
-		// Down(write)
-		wait_res = WaitForSingleObject(write_to_file, INFINITE);
-		if (wait_res != WAIT_OBJECT_0) ReportErrorAndEndProgram();
-		printf("Down(write_to_file), %d \n", roommate_num);
 
-		// cretae the string to write to the file
-	//	char numc = roommate_num + "0";
-	//	sprintf(numc,"%d ", roommate_num);
-		printf("Roomate Active -  %d \n", roommate_num);
-		PrintToFile("Roommate Active", p_params_for_roomate->report_file_path);
-	//	PrintToFile(numc, params_for_roomate.report_file_path);
-	//	PrintToFile("active\n", params_for_roomate.report_file_path);
-
-		// Up(write)
-		release_res = ReleaseMutex(write_to_file);
-		if (release_res == FALSE) ReportErrorAndEndProgram();
-		printf("down(write_to_file), %d \n", roommate_num);
+		// Write to report file
+		printf("Roomate Active - %d \n", roommate_num);
+		PrintToReportFile(roommate_num,p_params_for_roomate->report_file_path);
 
 		// down(laundry_room)
 
 		wait_res = WaitForSingleObject(laundry_room, INFINITE);
 		if (wait_res != WAIT_OBJECT_0) ReportErrorAndEndProgram();
 
-		printf("down(laundry_room), %d \n", roommate_num);
-
-
+		printf("cleared down(laundry_room) - %d\n", roommate_num);
 
 		// If times up:
 		TimeIsUp = *(p_params_for_roomate->time_is_up);
 		if (TimeIsUp == TRUE)
 		{
+			printf("Time is up -  %d \n", roommate_num);
 			// If the num of active roomates is 1 :
 			if (num_of_active_roomates == 1)
 			{
+				printf("num of active roomates is 1 - %d\n", roommate_num);
+
 				// Up(laundry_full)
 				release_res = ReleaseSemaphore(
 					laundry_full,
@@ -102,32 +90,41 @@ DWORD WINAPI Roommate(LPVOID lpParam)
 					NULL);
 				if (release_res == FALSE) ReportErrorAndEndProgram();
 				// ExitProcedure()
+				printf("Laundry_full Sempahore for robot release is up, exiting procedure - %d \n", roommate_num);
 				ExitProcedure(p_roommate_list);
+
 			}
 			else {
 
 				// ExitProcedure()
+				printf("Exiting procedure - %d \n", roommate_num);
 				ExitProcedure(p_roommate_list);
 			}
 
 		}
 		// LaundryRoomProcedure()
+		printf("%d Entering LaundryRoomProceadure with %d clothes\n", roommate_num, (*p_current_roommate).curret_clothes);
 		LaundryRoomProcedure(p_current_roommate);
+		printf("%d Exited LaundryRoomProceadure with %d clothes\n", roommate_num, (*p_current_roommate).curret_clothes);
+		printf("M = %d \n", num_of_clothes_in_basket);
+
+
 
 		// up(laundry_room)
-
 		release_res = ReleaseMutex(laundry_room);
 		if (release_res == FALSE) ReportErrorAndEndProgram();
+		printf("Completed up laundry_room - %d \n", roommate_num);
 
-		// If there are zero clothe in your basket:
+		// If there are zero clothes in your closet:
 		if ((*p_current_roommate).curret_clothes == 0)
 		{
+			printf("Zero Clothes in the closet of roomate %d \n", roommate_num);
+
 			// down(stuck_without_clothes)
-			release_res = ReleaseSemaphore(
-				(*p_current_roommate).NoClothes,
-				1, 		/* Signal that exactly one cell was filled */
-				NULL);
-			if (release_res == FALSE) ReportErrorAndEndProgram();
+			wait_res = WaitForSingleObject((p_current_roommate)->NoClothes, INFINITE);
+			if (wait_res != WAIT_OBJECT_0) ReportErrorAndEndProgram();
+
+			printf("Stuck without clothes - %d \n", roommate_num);
 		}
 
 		// Repeat

@@ -42,7 +42,6 @@ DWORD WINAPI LaundryBot(LPVOID lpParam)
 	while(TRUE)
 	{
 		// Down(laundry_full)
-
 		wait_res = WaitForSingleObject(laundry_full, INFINITE);
 		if (wait_res == FALSE) ReportErrorAndEndProgram();
 
@@ -56,19 +55,12 @@ DWORD WINAPI LaundryBot(LPVOID lpParam)
 
 		// Else: the robot needs to complete it's operation
 		// Writing in the log
-		// Up(log)
-		release_res = ReleaseMutex(write_to_file);
-		if (release_res == FALSE) ReportErrorAndEndProgram();
+
 
 		// write in the report file
 		printf("Robot Active \n");
+		//PrintToReportFile(-1 , p_report_file_path);
 
-		PrintToFile("bl33p bl00p, r0b0t 4ct1v3\n", p_report_file_path);
-
-		// Down(log)
-
-		wait_res = WaitForSingleObject(write_to_file, INFINITE);
-		if (wait_res != WAIT_OBJECT_0) ReportErrorAndEndProgram();
 
 		// Check each roomate whether he has zero clothes in his closet and he had a non zero num of clothes in the first place
 		for (i = 0; i < NUM_OF_ROOMMATES; i++)
@@ -79,6 +71,7 @@ DWORD WINAPI LaundryBot(LPVOID lpParam)
 				// empty the basket
 				num_of_clothes_in_basket = 0;
 				p_roomate_list[i].curret_clothes = p_roomate_list[i].total_clothes;  // fill up the closet
+				
 				release_res = ReleaseSemaphore(
 					p_roomate_list[i].NoClothes,
 					1, 		/* Signal that exactly one cell was filled */

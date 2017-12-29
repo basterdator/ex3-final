@@ -15,7 +15,9 @@
 
 
 
-int PrintToFile(char *p_msg, char **path);
+int PrintToReportFile(int num_of_roomate, char *path);
+int PrintToDebugFile(char *p_msg, char *path);
+
 
 
 

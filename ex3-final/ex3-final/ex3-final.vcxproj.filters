@@ -24,13 +24,16 @@
     <ClCompile Include="parse_parmeters.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PrintToFile.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Roommate.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="timer_thread.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PrintToReportFile.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PrintToDebugFile.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

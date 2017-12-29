@@ -113,7 +113,8 @@
     <ClCompile Include="LaundryBot.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="parse_parmeters.c" />
-    <ClCompile Include="PrintToFile.c" />
+    <ClCompile Include="PrintToDebugFile.c" />
+    <ClCompile Include="PrintToReportFile.c" />
     <ClCompile Include="Roommate.c" />
     <ClCompile Include="timer_thread.c" />
   </ItemGroup>
